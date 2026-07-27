@@ -63,7 +63,7 @@ export default function ClienteEditForm({ cliente }: Props) {
           name="nome"
           value={form.nome}
           onChange={handleChange}
-          className="w-full border rounded p-2"
+          className="w-full border rounded p-2 bg-white text-gray-900"
         />
         {erros.nome && <p className="text-red-500 text-sm mt-1">{erros.nome}</p>}
       </div>
@@ -74,7 +74,7 @@ export default function ClienteEditForm({ cliente }: Props) {
           name="codigo"
           value={form.codigo}
           onChange={handleChange}
-          className="w-full border rounded p-2"
+          className="w-full border rounded p-2 bg-white text-gray-900"
         />
       </div>
 
@@ -84,7 +84,7 @@ export default function ClienteEditForm({ cliente }: Props) {
           name="tag"
           value={form.tag}
           onChange={handleChange}
-          className="w-full border rounded p-2"
+          className="w-full border rounded p-2 bg-white text-gray-900"
         />
       </div>
 
@@ -94,7 +94,7 @@ export default function ClienteEditForm({ cliente }: Props) {
           name="contato"
           value={form.contato}
           onChange={handleChange}
-          className="w-full border rounded p-2"
+          className="w-full border rounded p-2 bg-white text-gray-900"
         />
       </div>
 
