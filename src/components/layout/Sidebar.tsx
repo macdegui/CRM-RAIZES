@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import LogoutButton from '@/components/ui/LogoutButton'
 
 const menus = [
   {
@@ -32,6 +33,7 @@ const menus = [
     grupo: 'Financeiro',
     itens: [
       { label: 'Gastos', href: '/gastos' },
+      { label: 'Categorias', href: '/categorias-gastos' },
       { label: 'Investimentos', href: '/investimentos' },
     ],
   },
@@ -75,6 +77,10 @@ export default function Sidebar() {
           </div>
         ))}
       </nav>
+
+      <div className="p-4 border-t border-gray-700">
+        <LogoutButton />
+      </div>
     </aside>
   )
 }
