@@ -50,7 +50,7 @@ export default function LoginForm() {
           type="email"
           value={form.email}
           onChange={handleChange}
-          className="w-full bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg p-3 pl-10 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+          className="w-full bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg p-3 pl-10 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
           placeholder="USERNAME"
         />
       </div>
@@ -66,7 +66,7 @@ export default function LoginForm() {
           type={mostrarSenha ? 'text' : 'password'}
           value={form.password}
           onChange={handleChange}
-          className="w-full bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg p-3 pl-10 pr-10 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+          className="w-full bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg p-3 pl-10 pr-10 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
           placeholder="PASSWORD"
         />
         <button
