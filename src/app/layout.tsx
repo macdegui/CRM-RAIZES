@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Geist } from 'next/font/google'
 import './globals.css'
-import Sidebar from '@/components/layout/Sidebar'
 
 const geist = Geist({ subsets: ['latin'] })
 
@@ -18,12 +17,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={geist.className}>
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <div className="flex-1 bg-gray-50">
-            {children}
-          </div>
-        </div>
+        {children}
       </body>
     </html>
   )
