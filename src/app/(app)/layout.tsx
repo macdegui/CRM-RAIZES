@@ -8,7 +8,7 @@ export default function AppLayout({
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex-1 bg-gray-50">
+      <div className="flex-1 bg-gray-50 min-w-0">
         {children}
       </div>
     </div>
