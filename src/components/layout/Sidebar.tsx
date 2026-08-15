@@ -10,17 +10,9 @@ const menus = [
     grupo: 'Vendas',
     itens: [
       { label: 'Clientes', href: '/clientes' },
-      { label: 'Pedidos', href: '/pedidos' },
-      { label: 'Entregas', href: '/entregas' },
-    ],
-  },
-  {
-    grupo: 'Produção',
-    itens: [
       { label: 'Produtos', href: '/produtos' },
-      { label: 'Receitas', href: '/receitas' },
-      { label: 'Lotes', href: '/lotes' },
-      { label: 'Ingredientes', href: '/ingredientes' },
+      { label: 'Pedidos', href: '/pedidos' },
+      { label: 'Pedidos Fechados', href: '/pedidos-fechados' },
     ],
   },
   {
@@ -28,6 +20,7 @@ const menus = [
     itens: [
       { label: 'Fornecedores', href: '/fornecedores' },
       { label: 'Compras', href: '/compras' },
+      { label: 'Insumos', href: '/ingredientes' },
     ],
   },
   {
@@ -46,7 +39,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Botão hambúrguer — só aparece no mobile */}
       <button
         onClick={() => setAberta(true)}
         className="md:hidden fixed top-4 left-4 z-50 bg-gray-900 text-white p-2 rounded-lg shadow-lg"
@@ -56,7 +48,6 @@ export default function Sidebar() {
         </svg>
       </button>
 
-      {/* Overlay escuro atrás da sidebar no mobile */}
       {aberta && (
         <div
           className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
@@ -64,7 +55,6 @@ export default function Sidebar() {
         />
       )}
 
-      {/* Sidebar */}
       <aside className={`
         fixed md:relative z-50 md:z-auto
         w-56 min-h-screen bg-gray-900 text-white flex flex-col
@@ -76,7 +66,6 @@ export default function Sidebar() {
             <h1 className="text-lg font-bold">CRM Raízes</h1>
             <p className="text-xs text-gray-400 mt-1">Pão de mel do Henrique</p>
           </div>
-          {/* Botão fechar — só no mobile */}
           <button
             onClick={() => setAberta(false)}
             className="md:hidden text-gray-400 hover:text-white"
