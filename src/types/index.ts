@@ -116,6 +116,10 @@ export type Pedido = {
   data: string
   observacao: string | null
   total: number | null
+  forma_pagamento: string | null
+  data_pagamento: string | null
+  tipo_entrega: string | null
+  custo_uber: number | null
   created_at: string
   updated_at: string
 }
@@ -126,6 +130,7 @@ export type PedidoItem = {
   produto_id: string
   quantidade: number
   preco_unitario: number
+  produzido: boolean
 }
 
 export type Entrega = {
