@@ -8,6 +8,31 @@ interface Props {
   tagsExistentes: string[]
 }
 
+function mascaraTelefone(valor: string) {
+  return valor
+    .replace(/\D/g, '')
+    .slice(0, 11)
+    .replace(/^(\d{2})(\d)/, '($1) $2')
+    .replace(/(\d{5})(\d)/, '$1-$2')
+}
+
+function mascaraCEP(valor: string) {
+  return valor
+    .replace(/\D/g, '')
+    .slice(0, 8)
+    .replace(/(\d{5})(\d)/, '$1-$2')
+}
+
+function mascaraCNPJ(valor: string) {
+  return valor
+    .replace(/\D/g, '')
+    .slice(0, 14)
+    .replace(/^(\d{2})(\d)/, '$1.$2')
+    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+    .replace(/\.(\d{3})(\d)/, '.$1/$2')
+    .replace(/(\d{4})(\d)/, '$1-$2')
+}
+
 export default function ClienteForm({ tagsExistentes }: Props) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -28,7 +53,12 @@ export default function ClienteForm({ tagsExistentes }: Props) {
   })
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    let valorFormatado = value
+    if (name === 'telefone') valorFormatado = mascaraTelefone(value)
+    if (name === 'cep') valorFormatado = mascaraCEP(value)
+    if (name === 'cnpj') valorFormatado = mascaraCNPJ(value)
+    setForm({ ...form, [name]: valorFormatado })
   }
 
   async function buscarCEP() {
@@ -91,7 +121,6 @@ export default function ClienteForm({ tagsExistentes }: Props) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5 max-w-lg">
 
-      {/* Nome */}
       <div>
         <label className="block text-sm font-medium mb-1">Nome *</label>
         <input
@@ -104,7 +133,6 @@ export default function ClienteForm({ tagsExistentes }: Props) {
         {erros.nome && <p className="text-red-500 text-sm mt-1">{erros.nome}</p>}
       </div>
 
-      {/* Telefone e Email */}
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-sm font-medium mb-1">Telefone *</label>
@@ -130,7 +158,6 @@ export default function ClienteForm({ tagsExistentes }: Props) {
         </div>
       </div>
 
-      {/* CEP e Endereço */}
       <div>
         <label className="block text-sm font-medium mb-1">CEP</label>
         <div className="flex gap-2">
@@ -140,7 +167,6 @@ export default function ClienteForm({ tagsExistentes }: Props) {
             onChange={handleChange}
             className="w-36 border rounded-lg p-2.5 bg-white text-gray-900"
             placeholder="00000-000"
-            maxLength={9}
           />
           <button
             type="button"
@@ -160,7 +186,6 @@ export default function ClienteForm({ tagsExistentes }: Props) {
         />
       </div>
 
-      {/* Estabelecimento e CNPJ */}
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-sm font-medium mb-1">Estabelecimento</label>
@@ -184,7 +209,6 @@ export default function ClienteForm({ tagsExistentes }: Props) {
         </div>
       </div>
 
-      {/* Tags */}
       <div>
         <div className="flex justify-between items-center mb-1">
           <label className="block text-sm font-medium">Tags</label>
@@ -196,8 +220,6 @@ export default function ClienteForm({ tagsExistentes }: Props) {
             Gerenciar tags
           </button>
         </div>
-
-        {/* Tags selecionadas */}
         <div className="flex flex-wrap gap-2 mb-2">
           {tagsSelecionadas.map(tag => (
             <span key={tag} className="flex items-center gap-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
@@ -206,8 +228,6 @@ export default function ClienteForm({ tagsExistentes }: Props) {
             </span>
           ))}
         </div>
-
-        {/* Painel de gerenciar tags */}
         {gerenciarTags && (
           <div className="border rounded-lg p-3 bg-gray-50">
             <p className="text-xs text-gray-500 mb-2">Tags disponíveis:</p>
@@ -243,7 +263,6 @@ export default function ClienteForm({ tagsExistentes }: Props) {
         )}
       </div>
 
-      {/* Observações */}
       <div>
         <label className="block text-sm font-medium mb-1">Observações</label>
         <textarea

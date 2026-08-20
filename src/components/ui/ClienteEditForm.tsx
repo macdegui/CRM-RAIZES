@@ -10,6 +10,31 @@ interface Props {
   tagsExistentes: string[]
 }
 
+function mascaraTelefone(valor: string) {
+  return valor
+    .replace(/\D/g, '')
+    .slice(0, 11)
+    .replace(/^(\d{2})(\d)/, '($1) $2')
+    .replace(/(\d{5})(\d)/, '$1-$2')
+}
+
+function mascaraCEP(valor: string) {
+  return valor
+    .replace(/\D/g, '')
+    .slice(0, 8)
+    .replace(/(\d{5})(\d)/, '$1-$2')
+}
+
+function mascaraCNPJ(valor: string) {
+  return valor
+    .replace(/\D/g, '')
+    .slice(0, 14)
+    .replace(/^(\d{2})(\d)/, '$1.$2')
+    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+    .replace(/\.(\d{3})(\d)/, '.$1/$2')
+    .replace(/(\d{4})(\d)/, '$1-$2')
+}
+
 export default function ClienteEditForm({ cliente, tagsExistentes }: Props) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -32,7 +57,12 @@ export default function ClienteEditForm({ cliente, tagsExistentes }: Props) {
   })
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    let valorFormatado = value
+    if (name === 'telefone') valorFormatado = mascaraTelefone(value)
+    if (name === 'cep') valorFormatado = mascaraCEP(value)
+    if (name === 'cnpj') valorFormatado = mascaraCNPJ(value)
+    setForm({ ...form, [name]: valorFormatado })
   }
 
   async function buscarCEP() {
@@ -95,7 +125,6 @@ export default function ClienteEditForm({ cliente, tagsExistentes }: Props) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5 max-w-lg">
 
-      {/* Código gerado automaticamente */}
       {cliente.codigo && (
         <div className="bg-gray-50 border rounded-lg p-3 text-sm text-gray-500">
           Código: <span className="font-bold text-gray-900">{cliente.codigo}</span>
@@ -122,6 +151,7 @@ export default function ClienteEditForm({ cliente, tagsExistentes }: Props) {
             value={form.telefone}
             onChange={handleChange}
             className="w-full border rounded-lg p-2.5 bg-white text-gray-900"
+            placeholder="(11) 99999-9999"
           />
           {erros.telefone && <p className="text-red-500 text-sm mt-1">{erros.telefone}</p>}
         </div>
@@ -145,7 +175,7 @@ export default function ClienteEditForm({ cliente, tagsExistentes }: Props) {
             value={form.cep}
             onChange={handleChange}
             className="w-36 border rounded-lg p-2.5 bg-white text-gray-900"
-            maxLength={9}
+            placeholder="00000-000"
           />
           <button
             type="button"
@@ -182,6 +212,7 @@ export default function ClienteEditForm({ cliente, tagsExistentes }: Props) {
             value={form.cnpj}
             onChange={handleChange}
             className="w-full border rounded-lg p-2.5 bg-white text-gray-900"
+            placeholder="00.000.000/0000-00"
           />
         </div>
       </div>
