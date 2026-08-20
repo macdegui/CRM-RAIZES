@@ -10,7 +10,6 @@ export default function LoginPage() {
             alt="Raízes"
             className="w-40 h-auto mb-4"
           />
-          <p className="text-white text-sm opacity-60">Pão de mel do Henrique</p>
         </div>
         <LoginForm />
       </div>
