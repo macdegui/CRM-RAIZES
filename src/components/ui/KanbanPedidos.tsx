@@ -27,26 +27,23 @@ export default function KanbanPedidos({ pedidos, itens, clientes, produtos }: Pr
   }, {} as Record<string, PedidoItem[]>)
 
   const pedidosAtivos = pedidos.filter(p => p.status !== 'PAGO')
-  const pedidosFiltrados = filtro === 'todos'
-    ? pedidosAtivos
-    : pedidosAtivos.filter(p => {
-        if (filtro === 'amarelo') return p.status === 'PENDENTE' || p.status === 'EM_PRODUCAO'
-        if (filtro === 'verde') return p.status === 'EM_PRODUCAO' && itensPorPedido[p.id]?.every(i => i.produzido)
-        if (filtro === 'azul') return p.status === 'ENTREGUE'
-        return true
-      })
 
-  const amarelos = pedidosFiltrados.filter(p => {
+  const amarelos = pedidosAtivos.filter(p => {
     const its = itensPorPedido[p.id] ?? []
-    return p.status === 'PENDENTE' || (p.status === 'EM_PRODUCAO' && !its.every(i => i.produzido))
+    return its.length === 0 || !its.every(i => i.produzido)
   })
-  const verdes = pedidosFiltrados.filter(p => {
+  const verdes = pedidosAtivos.filter(p => {
     const its = itensPorPedido[p.id] ?? []
-    return its.length > 0 && its.every(i => i.produzido) && p.status !== 'ENTREGUE' && p.status !== 'PAGO'
+    return its.length > 0 && its.every(i => i.produzido) && p.status !== 'ENTREGUE'
   })
-  const azuis = pedidosFiltrados.filter(p => p.status === 'ENTREGUE')
+  const azuis = pedidosAtivos.filter(p => p.status === 'ENTREGUE')
 
-  // Totais a produzir (só amarelos)
+  const pedidosFiltrados = {
+    amarelo: filtro === 'todos' || filtro === 'amarelo' ? amarelos : [],
+    verde: filtro === 'todos' || filtro === 'verde' ? verdes : [],
+    azul: filtro === 'todos' || filtro === 'azul' ? azuis : [],
+  }
+
   const totaisProdutos: Record<string, { nome: string; total: number }> = {}
   amarelos.forEach(p => {
     const its = itensPorPedido[p.id] ?? []
@@ -69,11 +66,7 @@ export default function KanbanPedidos({ pedidos, itens, clientes, produtos }: Pr
   async function avancarParaEntregue(pedido: Pedido, tipoEntrega: string, custoUber?: number) {
     await supabase
       .from('pedidos')
-      .update({
-        status: 'ENTREGUE',
-        tipo_entrega: tipoEntrega,
-        custo_uber: custoUber ?? null,
-      })
+      .update({ status: 'ENTREGUE', tipo_entrega: tipoEntrega, custo_uber: custoUber ?? null })
       .eq('id', pedido.id)
     router.refresh()
   }
@@ -81,19 +74,33 @@ export default function KanbanPedidos({ pedidos, itens, clientes, produtos }: Pr
   async function marcarPago(pedido: Pedido, formaPagamento: string, dataPagamento: string) {
     await supabase
       .from('pedidos')
-      .update({
-        status: 'PAGO',
-        forma_pagamento: formaPagamento,
-        data_pagamento: dataPagamento,
-      })
+      .update({ status: 'PAGO', forma_pagamento: formaPagamento, data_pagamento: dataPagamento })
+      .eq('id', pedido.id)
+    router.refresh()
+  }
+
+  async function voltarParaAmarelo(pedido: Pedido) {
+    const its = itensPorPedido[pedido.id] ?? []
+    await Promise.all(
+      its.map(i => supabase.from('pedido_itens').update({ produzido: false }).eq('id', i.id))
+    )
+    await supabase
+      .from('pedidos')
+      .update({ status: 'PENDENTE' })
+      .eq('id', pedido.id)
+    router.refresh()
+  }
+
+  async function voltarParaVerde(pedido: Pedido) {
+    await supabase
+      .from('pedidos')
+      .update({ status: 'EM_PRODUCAO', tipo_entrega: null, custo_uber: null })
       .eq('id', pedido.id)
     router.refresh()
   }
 
   return (
     <div className="flex flex-col min-h-screen pb-32">
-
-      {/* Barra de filtros */}
       <div className="bg-white border-b px-4 py-2 flex gap-2 flex-wrap items-center">
         {[
           { key: 'todos', label: 'Todos' },
@@ -115,15 +122,12 @@ export default function KanbanPedidos({ pedidos, itens, clientes, produtos }: Pr
         ))}
       </div>
 
-      {/* Colunas */}
       <div className="flex gap-4 p-4 overflow-x-auto flex-1 items-start">
-
-        {/* Coluna Amarela */}
         <Coluna
           titulo="A produzir"
           cor="amarelo"
-          count={amarelos.length}
-          pedidos={amarelos}
+          count={pedidosFiltrados.amarelo.length}
+          pedidos={pedidosFiltrados.amarelo}
           itensPorPedido={itensPorPedido}
           clientesMap={clientesMap}
           produtosMap={produtosMap}
@@ -132,14 +136,13 @@ export default function KanbanPedidos({ pedidos, itens, clientes, produtos }: Pr
           onToggleProduzido={toggleProduzido}
           onAvancar={avancarParaEntregue}
           onMarcarPago={marcarPago}
+          onVoltarEtapa={null}
         />
-
-        {/* Coluna Verde */}
         <Coluna
           titulo="Pronto para entregar"
           cor="verde"
-          count={verdes.length}
-          pedidos={verdes}
+          count={pedidosFiltrados.verde.length}
+          pedidos={pedidosFiltrados.verde}
           itensPorPedido={itensPorPedido}
           clientesMap={clientesMap}
           produtosMap={produtosMap}
@@ -148,14 +151,13 @@ export default function KanbanPedidos({ pedidos, itens, clientes, produtos }: Pr
           onToggleProduzido={toggleProduzido}
           onAvancar={avancarParaEntregue}
           onMarcarPago={marcarPago}
+          onVoltarEtapa={voltarParaAmarelo}
         />
-
-        {/* Coluna Azul */}
         <Coluna
           titulo="Entregue"
           cor="azul"
-          count={azuis.length}
-          pedidos={azuis}
+          count={pedidosFiltrados.azul.length}
+          pedidos={pedidosFiltrados.azul}
           itensPorPedido={itensPorPedido}
           clientesMap={clientesMap}
           produtosMap={produtosMap}
@@ -164,10 +166,10 @@ export default function KanbanPedidos({ pedidos, itens, clientes, produtos }: Pr
           onToggleProduzido={toggleProduzido}
           onAvancar={avancarParaEntregue}
           onMarcarPago={marcarPago}
+          onVoltarEtapa={voltarParaVerde}
         />
       </div>
 
-      {/* Rodapé fixo com totais a produzir */}
       {Object.keys(totaisProdutos).length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 bg-amber-900 text-white px-4 py-3 flex gap-6 flex-wrap items-center shadow-lg z-30">
           <span className="text-xs uppercase tracking-widest opacity-75 w-full md:w-auto">
@@ -185,7 +187,6 @@ export default function KanbanPedidos({ pedidos, itens, clientes, produtos }: Pr
   )
 }
 
-// ---- Componente de Coluna ----
 interface ColunaProps {
   titulo: string
   cor: 'amarelo' | 'verde' | 'azul'
@@ -199,13 +200,14 @@ interface ColunaProps {
   onToggleProduzido: (item: PedidoItem) => void
   onAvancar: (pedido: Pedido, tipo: string, custo?: number) => void
   onMarcarPago: (pedido: Pedido, forma: string, data: string) => void
+  onVoltarEtapa: ((pedido: Pedido) => void) | null
 }
 
-function Coluna({ titulo, cor, count, pedidos, itensPorPedido, clientesMap, produtosMap, expandido, setExpandido, onToggleProduzido, onAvancar, onMarcarPago }: ColunaProps) {
+function Coluna({ titulo, cor, count, pedidos, itensPorPedido, clientesMap, produtosMap, expandido, setExpandido, onToggleProduzido, onAvancar, onMarcarPago, onVoltarEtapa }: ColunaProps) {
   const cores = {
-    amarelo: { borda: 'border-amber-400', bolinha: 'bg-amber-400', header: 'text-amber-700' },
-    verde: { borda: 'border-green-500', bolinha: 'bg-green-500', header: 'text-green-700' },
-    azul: { borda: 'border-blue-500', bolinha: 'bg-blue-500', header: 'text-blue-700' },
+    amarelo: { bolinha: 'bg-amber-400', header: 'text-amber-700' },
+    verde: { bolinha: 'bg-green-500', header: 'text-green-700' },
+    azul: { bolinha: 'bg-blue-500', header: 'text-blue-700' },
   }
 
   return (
@@ -235,13 +237,13 @@ function Coluna({ titulo, cor, count, pedidos, itensPorPedido, clientesMap, prod
           onToggleProduzido={onToggleProduzido}
           onAvancar={onAvancar}
           onMarcarPago={onMarcarPago}
+          onVoltarEtapa={onVoltarEtapa}
         />
       ))}
     </div>
   )
 }
 
-// ---- Componente de Cartão ----
 interface CartaoProps {
   pedido: Pedido
   cor: 'amarelo' | 'verde' | 'azul'
@@ -253,9 +255,10 @@ interface CartaoProps {
   onToggleProduzido: (item: PedidoItem) => void
   onAvancar: (pedido: Pedido, tipo: string, custo?: number) => void
   onMarcarPago: (pedido: Pedido, forma: string, data: string) => void
+  onVoltarEtapa: ((pedido: Pedido) => void) | null
 }
 
-function Cartao({ pedido, cor, itens, cliente, produtosMap, expandido, onToggle, onToggleProduzido, onAvancar, onMarcarPago }: CartaoProps) {
+function Cartao({ pedido, cor, itens, cliente, produtosMap, expandido, onToggle, onToggleProduzido, onAvancar, onMarcarPago, onVoltarEtapa }: CartaoProps) {
   const [tipoEntrega, setTipoEntrega] = useState('')
   const [custoUber, setCustoUber] = useState('')
   const [formaPagamento, setFormaPagamento] = useState('')
@@ -267,9 +270,14 @@ function Cartao({ pedido, cor, itens, cliente, produtosMap, expandido, onToggle,
     azul: 'bg-blue-50 border-blue-200 border-l-blue-500',
   }
 
+  const voltarLabel = {
+    verde: '← Voltar para A produzir',
+    azul: '← Voltar para Pronto',
+    amarelo: '',
+  }
+
   return (
     <div className={`border border-l-4 rounded-xl mb-3 overflow-hidden shadow-sm ${bgCores[cor]}`}>
-      {/* Topo do cartão */}
       <div className="p-3 cursor-pointer" onClick={onToggle}>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xs font-bold text-gray-500 font-mono">{pedido.id.slice(0, 8).toUpperCase()}</span>
@@ -279,7 +287,6 @@ function Cartao({ pedido, cor, itens, cliente, produtosMap, expandido, onToggle,
         <p className="text-xs text-gray-500 mt-0.5">{cliente?.codigo ?? ''}</p>
       </div>
 
-      {/* Itens sempre visíveis */}
       <div className="px-3 pb-2">
         {itens.map(item => (
           <div key={item.id} className="flex items-center gap-2 py-1.5 border-t border-dashed border-gray-200">
@@ -299,9 +306,18 @@ function Cartao({ pedido, cor, itens, cliente, produtosMap, expandido, onToggle,
         ))}
       </div>
 
-      {/* Expansível */}
       {expandido && (
         <div className="px-3 pb-3 border-t border-gray-200 pt-3 flex flex-col gap-3">
+
+          {/* Voltar etapa */}
+          {onVoltarEtapa && (
+            <button
+              onClick={() => onVoltarEtapa(pedido)}
+              className="w-full text-xs text-gray-500 border border-gray-300 rounded-lg py-2 hover:bg-gray-50 transition-colors"
+            >
+              {voltarLabel[cor]}
+            </button>
+          )}
 
           {/* Entrega */}
           {cor !== 'azul' && (
@@ -379,7 +395,6 @@ function Cartao({ pedido, cor, itens, cliente, produtosMap, expandido, onToggle,
         </div>
       )}
 
-      {/* Botão expandir */}
       <button
         onClick={onToggle}
         className="w-full text-xs text-gray-400 py-1.5 border-t border-gray-200 hover:bg-gray-50 transition-colors"
