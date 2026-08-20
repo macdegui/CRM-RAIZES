@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import LogoutButton from '@/components/ui/LogoutButton'
+import Image from 'next/image'
 
 const menus = [
   {
@@ -61,11 +62,17 @@ export default function Sidebar() {
         transition-transform duration-300
         ${aberta ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
-        <div className="p-6 border-b border-gray-700 flex justify-between items-center">
-          <div>
-            <h1 className="text-lg font-bold">CRM Raízes</h1>
-            <p className="text-xs text-gray-400 mt-1">Pão de mel do Henrique</p>
-          </div>
+        <div className="p-4 border-b border-gray-700 flex justify-between items-center">
+          <Link href="/">
+            <Image
+              src="/logo-escura.png"
+              alt="Raízes"
+              width={120}
+              height={120}
+              className="w-24 h-auto"
+              priority
+            />
+          </Link>
           <button
             onClick={() => setAberta(false)}
             className="md:hidden text-gray-400 hover:text-white"
