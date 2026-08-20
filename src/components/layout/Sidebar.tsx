@@ -41,7 +41,7 @@ export default function Sidebar() {
     <>
       <button
         onClick={() => setAberta(true)}
-        className="md:hidden fixed top-4 left-4 z-50 bg-gray-900 text-white p-2 rounded-lg shadow-lg"
+        className="md:hidden fixed top-4 left-4 z-50 bg-black text-white p-2 rounded-lg shadow-lg"
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
@@ -57,7 +57,7 @@ export default function Sidebar() {
 
       <aside className={`
         fixed md:relative z-50 md:z-auto
-        w-56 min-h-screen bg-gray-900 text-white flex flex-col
+        w-56 min-h-screen bg-black text-white flex flex-col
         transition-transform duration-300
         ${aberta ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>

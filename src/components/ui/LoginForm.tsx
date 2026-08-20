@@ -40,7 +40,7 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white opacity-70">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
           </svg>
@@ -50,13 +50,13 @@ export default function LoginForm() {
           type="email"
           value={form.email}
           onChange={handleChange}
-          className="w-full bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg p-3 pl-10 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
-          placeholder="USERNAME"
+          className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-400"
+          placeholder="Email"
         />
       </div>
 
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white opacity-70">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
           </svg>
@@ -66,13 +66,13 @@ export default function LoginForm() {
           type={mostrarSenha ? 'text' : 'password'}
           value={form.password}
           onChange={handleChange}
-          className="w-full bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg p-3 pl-10 pr-10 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
-          placeholder="PASSWORD"
+          className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 pl-10 pr-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-400"
+          placeholder="Senha"
         />
         <button
           type="button"
           onClick={() => setMostrarSenha(!mostrarSenha)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-white opacity-70 hover:opacity-100"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
         >
           {mostrarSenha ? (
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -88,13 +88,13 @@ export default function LoginForm() {
       </div>
 
       {erro && (
-        <p className="text-white text-sm text-center bg-red-500 bg-opacity-40 rounded-lg p-2">{erro}</p>
+        <p className="text-red-400 text-sm text-center">{erro}</p>
       )}
 
       <button
         type="submit"
         disabled={loading}
-        className="bg-white text-blue-600 rounded-lg p-3 font-bold hover:bg-opacity-90 disabled:opacity-50 transition-all mt-2 tracking-widest uppercase"
+        className="bg-white text-black rounded-lg p-3 font-bold hover:bg-gray-100 disabled:opacity-50 transition-all mt-2 tracking-widest uppercase"
       >
         {loading ? 'Entrando...' : 'Login'}
       </button>
