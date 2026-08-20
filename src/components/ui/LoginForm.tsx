@@ -33,7 +33,7 @@ export default function LoginForm() {
       return
     }
 
-    router.push('/clientes')
+    router.push('/')
     router.refresh()
   }
 
