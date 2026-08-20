@@ -2,8 +2,14 @@ export type Cliente = {
   id: string
   nome: string
   codigo: string | null
+  telefone: string | null
+  email: string | null
   tag: string | null
-  contato: string | null
+  cep: string | null
+  endereco: string | null
+  nome_estabelecimento: string | null
+  cnpj: string | null
+  observacoes: string | null
   created_at: string
   updated_at: string
 }
@@ -111,6 +117,7 @@ export type CompraItem = {
 
 export type Pedido = {
   id: string
+  codigo: string | null
   cliente_id: string
   status: 'PENDENTE' | 'EM_PRODUCAO' | 'ENTREGUE' | 'PAGO'
   data: string
