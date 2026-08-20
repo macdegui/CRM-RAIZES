@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import LogoutButton from '@/components/ui/LogoutButton'
-import Image from 'next/image'
 
 const menus = [
   {
@@ -63,14 +62,11 @@ export default function Sidebar() {
         ${aberta ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
         <div className="p-4 border-b border-gray-700 flex justify-between items-center">
-          <Link href="/">
-            <Image
+          <Link href="/" onClick={() => setAberta(false)}>
+            <img
               src="/logo-escura.png"
               alt="Raízes"
-              width={120}
-              height={120}
               className="w-24 h-auto"
-              priority
             />
           </Link>
           <button
